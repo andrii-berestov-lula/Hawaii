@@ -8,8 +8,51 @@
     </PropertyGroup>
 
     <ItemGroup>
+    <None Include="build\**">
+        <Pack>true</Pack>
+        <PackagePath>build\</PackagePath>
+    </None>
+    </ItemGroup>
+
+    <ItemDefinitionGroup>
+        <PackageReference>
+            <PrivateAssets>All</PrivateAssets>
+            <Publish>true</Publish>
+        </PackageReference>
+    </ItemDefinitionGroup>
+    
+    <ItemGroup>
+        <PackageReference Update="FSharp.Core" Verion="5.0.1" Version="5.0.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; compile; build; native; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!--MSBuild and dependencies only acquired through MSBuild shall not make it into the final package-->
+        <PackageReference Include="System.Collections.Immutable" Version="5.0.0" CopyLocal="false" Publish="false" />
+        <PackageReference Include="Microsoft.Build.Framework;Microsoft.Build.Utilities.Core" Version="16.10.0" CopyLocal="false" Publish="false" />
+        <!--ExcludeAssets="runtime"-->
+        <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" CopyLocal="false" Publish="false" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" CopyLocal="false" Publish="false" />
+    </ItemGroup>
+
+    <Target Name="RemoveMicrosoftBuildDllsFromOutput" AfterTargets="ResolveReferences">
+        <!--
+        Don't place build dlls in the output dir or else the ContextAwareTask will resolve them
+        and may not be able to cast the TaskHost to IBuildEngine
+        -->
+        <PropertyGroup>
+            <NonCopyLocalPackageReferences Condition="'%(PackageReference.CopyLocal)' == 'false'">;@(PackageReference);</NonCopyLocalPackageReferences>
+        </PropertyGroup>
+        <ItemGroup>
+            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="$(NonCopyLocalPackageReferences.Contains(';%(ReferenceCopyLocalPaths.NuGetPackageId);'))" />
+        </ItemGroup>
+    </Target>
+    
+    <ItemGroup>
+        <None Include="build\**" Pack="true" PackagePath="build"/>
         <Compile Include="GenerateOpenAPIClient.fs"/>
-        <Compile Include="Program.fs"/>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="../src/Hawaii.fsproj" PrivateAssets="All"/>
