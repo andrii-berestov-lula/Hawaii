@@ -1,0 +1,66 @@
+<Project>
+    <PropertyGroup>
+        <BuildDependsOn>
+            GenerateOpenAPIClient;
+            $(BuildDependsOn)
+        </BuildDependsOn>
+    </PropertyGroup>
+    <PropertyGroup>
+        <_SourceGeneratorCacheFile>$(IntermediateOutputPath)\g\generation.cache</_SourceGeneratorCacheFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <SourceGeneratorInput Include="@(Compile)"/>
+        <SourceGeneratorInput Include="@(Content)"/>
+        <SourceGeneratorInput Include="@(None)"/>
+    </ItemGroup>
+    
+    <Target Name="_InjectGeneratedFiles" BeforeTargets="ResolveNuGetPackageAssets;BeforeCompile" Condition="('$(BuildingProject)' == 'false' or '$(DesignTimeBuild)' == 'true') and '$(MSBuildProjectExtension)'=='.fsproj'">
+
+        <!--This target is used to temporarily include generated files to help IntelliSense
+    make sense of generated code.-->
+        <ReadLinesFromFile File="$(_SourceGeneratorCacheFile)">
+            <Output TaskParameter="Lines" ItemName="GeneratedFilesCachedItems"/>
+        </ReadLinesFromFile>
+        <ItemGroup>
+            <_OriginCompile Include="@(Compile)"/>
+            <Compile Remove="@(_OriginCompile)"/>
+            <Compile Include="@(GeneratedFilesCachedItems)"/>
+            <Compile Include="@(_OriginCompile)"/>
+            <_OriginCompile Remove="@(_OriginCompile)"/>
+            <!--Inform tooling & IDE of new files to process (mostly for IntelliSense)-->
+            <_GeneratedCodeFiles Include="@(GeneratedFilesCachedItems)"/>
+        </ItemGroup>
+    </Target>
+
+    <ItemGroup>
+        <PackageReference Include="Fable.Remoting.Json" Version="2.14.*" Condition="$(HawaiiTarget) == 'fable'"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <TaskAssembly>$(MSBuildThisFileDirectory)..\build\$(TaskFolder)\Hawaii.Tasks.dll</TaskAssembly>
+    </PropertyGroup>
+    <UsingTask TaskName="Hawaii.Tasks.GenerateOpenAPIClient" AssemblyFile="$(TaskAssembly)"/>
+
+    <Target Name="GenerateOpenAPIClient" BeforeTargets="BeforeReBuild" Outputs="$(_SourceGeneratorCacheFile)">
+        <GenerateOpenAPIClient OutputPath="$(IntermediateOutputPath)\g"
+                               Project="$(HawaiiProjectName)"
+                               Schema="$(HawaiiSchemaPath)"
+                               Target="$(HawaiiTargetProjectType)"
+                               Configuration="$(Configuration)"
+                               Platform="$(Platform)">
+            <Output TaskParameter="GeneratedFiles" ItemName="HawaiiGeneratedFiles"/>
+        </GenerateOpenAPIClient>
+        <Message Text="Generated files:" Importance="high"/>
+        <Message Text="@(HawaiiGeneratedFiles)"/>
+        <Message Text="@(DesignTimeBuild)"/>
+        <ItemGroup>
+            <_OriginCompile Include="@(Compile)"/>
+            <Compile Remove="@(_OriginCompile)"/>
+            <Compile Remove="@(GeneratedFilesCachedItems)"/>
+            <Compile Include="@(HawaiiGeneratedFiles)"/>
+            <Compile Include="@(_OriginCompile)"/>
+            <_OriginCompile Remove="@(_OriginCompile)"/>
+            <_GeneratedCodeFiles Include="@(GeneratedFilesCachedItems)"/>
+        </ItemGroup>
+        <WriteLinesToFile File="$(_SourceGeneratorCacheFile)" Lines="@(HawaiiGeneratedFiles)" Overwrite="true"/>
+    </Target>
+</Project>

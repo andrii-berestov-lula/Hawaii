@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Hawaii.Tasks", "tasks\Hawaii.Tasks.fsproj", "{76844829-227D-4F12-93F1-0CDBD2783C41}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,18 @@ Global
 		{BE2103F8-B656-4CB3-91DA-DDFB2E66DF27}.Release|x64.Build.0 = Release|Any CPU
 		{BE2103F8-B656-4CB3-91DA-DDFB2E66DF27}.Release|x86.ActiveCfg = Release|Any CPU
 		{BE2103F8-B656-4CB3-91DA-DDFB2E66DF27}.Release|x86.Build.0 = Release|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Debug|x64.Build.0 = Debug|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Debug|x86.Build.0 = Debug|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Release|x64.ActiveCfg = Release|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Release|x64.Build.0 = Release|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Release|x86.ActiveCfg = Release|Any CPU
+		{76844829-227D-4F12-93F1-0CDBD2783C41}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
