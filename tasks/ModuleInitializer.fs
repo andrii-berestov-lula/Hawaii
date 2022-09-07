@@ -1,5 +1,4 @@
 #if !NETCOREAPP2_0
-
 namespace Hawaii.Tasks
 
 type ModuleInitializer () =

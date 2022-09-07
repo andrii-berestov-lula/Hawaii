@@ -3,12 +3,14 @@
     <Description>dotnet CLI tool to generate type-safe F# clients from OpenAPI/Swagger services</Description>
     <OutputType>Exe</OutputType>
     <ToolCommandName>hawaii</ToolCommandName>
-    <TargetFramework>net5.0</TargetFramework>
     <PackAsTool>true</PackAsTool>
     <IsPackable>true</IsPackable>
     <RollForward>Major</RollForward>
+    <TargetFramework Condition=" '$(IsNuget)' != '' ">net5.0</TargetFramework>
+    <TargetFrameworks Condition=" '$(IsNuget)' == '' ">netstandard2.0; netcoreapp3.1;net5.0</TargetFrameworks>
     <Version>0.60.0</Version>
     <PackageReleaseNotes>Apply headers from request parts</PackageReleaseNotes>
+    <AutoGenerateBindingRedirects Condition=" '$(IsNuget)' == '' ">true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="./storage.json">

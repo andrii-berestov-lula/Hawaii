@@ -1,6 +1,7 @@
 namespace Hawaii.Tasks
 
 open System
+open System.Diagnostics
 open System.IO
 open System.Text.Json
 open Microsoft.Build.Utilities
@@ -38,6 +39,7 @@ type public GenerateOpenAPIClient() =
         | _ -> None
         
     override this.Execute() =
+        Debugger.Launch() |> ignore
         if String.IsNullOrEmpty this.Schema then raise (Exception "Schema must not be null or empty")
         if String.IsNullOrEmpty this.Target then raise (Exception "Target must be fable or fsharp")
         if String.IsNullOrEmpty this.Project then raise (Exception "Project must not be null or empty")

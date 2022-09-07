@@ -5,8 +5,18 @@
         <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
 
+    <!-- Properties for Hawaii compile task -->
+    <PropertyGroup>
+        <HawaiiProjectName>Test</HawaiiProjectName>
+        <HawaiiSchemaPath>./schema.json</HawaiiSchemaPath>
+        <HawaiiTargetProjectType>fsharp</HawaiiTargetProjectType>
+    </PropertyGroup>
+   
     <ItemGroup>
+        <PackageReference Include="Hawaii.Tasks" Version="1.0.0-preview-1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <Compile Include="Program.fs"/>
     </ItemGroup>
-
 </Project>

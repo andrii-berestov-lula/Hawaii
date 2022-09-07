@@ -1,10 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net5.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.0</TargetFrameworks>
         <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <Version>0.60.0</Version>
+        <Version>1.0.0-preview-1</Version>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
         <PackageReleaseNotes>Apply headers from request parts</PackageReleaseNotes>
     </PropertyGroup>
 
@@ -14,9 +17,19 @@
             <BuildSubDir Condition=" '$(TargetFramework)' == 'net5.0' ">MSBuildCore\</BuildSubDir>
             <BuildSubDir Condition=" '$(TargetFramework)' == 'netstandard2.0' ">MSBuildFull\</BuildSubDir>
         </PropertyGroup>
-        <Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' " />
+        <Error Text="Unrecognized TargetFramework" Condition=" '$(BuildSubDir)' == '' "/>
         <ItemGroup>
-            <TfmSpecificPackageFile Include="&#xD;&#xA;                              $(OutputPath)Hawaii.Tasks.dll*;&#xD;&#xA;                              $(OutputPath)Hawaii.dll*;&#xD;&#xA;                              $(OutputPath)Fantomas.dll*;&#xD;&#xA;                              $(OutputPath)FsAst.dll*;&#xD;&#xA;                              $(OutputPath)Microsoft.Build.Tasks.Core.dll*;&#xD;&#xA;                              $(OutputPath)FSharp.Compiler.Service.dll*;&#xD;&#xA;                              $(OutputPath)FSharp.Core.dll*;&#xD;&#xA;                              $(OutputPath)FSharp.Data.LiteralProviders.Runtime.dll*;&#xD;&#xA;                              $(OutputPath)Microsoft.OpenApi.OData.dll*;&#xD;&#xA;                              $(OutputPath)Microsoft.OpenApi.Readers.dll*;&#xD;&#xA;                              ">
+            <TfmSpecificPackageFile Include="
+                                             $(OutputPath)Hawaii.Tasks.dll*;
+                                             $(OutputPath)Hawaii.dll*;
+                                             $(OutputPath)Fantomas.dll*;
+                                             $(OutputPath)FsAst.dll*;
+                                             $(OutputPath)Microsoft.Build.Tasks.Core.dll*;
+                                             $(OutputPath)FSharp.Compiler.Service.dll*;
+                                             $(OutputPath)FSharp.Core.dll*;
+                                             $(OutputPath)FSharp.Data.LiteralProviders.Runtime.dll*;
+                                             $(OutputPath)Microsoft.OpenApi.OData.dll*;
+                                             $(OutputPath)Microsoft.OpenApi.Readers.dll*;">
                 <PackagePath>build\$(BuildSubDir)</PackagePath>
             </TfmSpecificPackageFile>
             <!-- Package up the Hawaii and its dependencies -->
@@ -31,6 +44,10 @@
             <Pack>true</Pack>
             <PackagePath>build\</PackagePath>
         </None>
+        <None Include="buildCrossTargeting\**">
+            <Pack>true</Pack>
+            <PackagePath>buildCrossTargeting\</PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemDefinitionGroup>
@@ -41,6 +58,9 @@
     </ItemDefinitionGroup>
 
     <ItemGroup>
+        <PackageReference Include="FSharp.Compiler.Service" Version="39.0.0" CopyLocal="true" Publish="false" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="All" CopyLocal="true" Publish="false" />
+        <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
         <PackageReference Update="FSharp.Core" Verion="5.0.1" Version="5.0.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; compile; build; native; analyzers; buildtransitive</IncludeAssets>
@@ -49,17 +69,17 @@
 
     <ItemGroup>
         <!--MSBuild and dependencies only acquired through MSBuild shall not make it into the final package-->
-        <PackageReference Include="System.Collections.Immutable" Version="5.0.0" CopyLocal="false" Publish="false" />
-        <PackageReference Include="Microsoft.Build.Framework;Microsoft.Build.Utilities.Core" Version="16.10.0" CopyLocal="false" Publish="false" />
+        <PackageReference Include="System.Collections.Immutable" Version="5.0.0" CopyLocal="false" Publish="false"/>
+        <PackageReference Include="Microsoft.Build.Framework;Microsoft.Build.Utilities.Core" Version="16.10.0" CopyLocal="false" Publish="false"/>
         <!--ExcludeAssets="runtime"-->
-        <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" CopyLocal="false" Publish="false" />
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" CopyLocal="false" Publish="false" />
+        <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" CopyLocal="false" Publish="false"/>
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" CopyLocal="false" Publish="false"/>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
-        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" CopyLocal="false" Publish="false" />
+        <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30" CopyLocal="false" Publish="false"/>
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" CopyLocal="false" Publish="false" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" CopyLocal="false" Publish="false"/>
     </ItemGroup>
     <Target Name="RemoveMicrosoftBuildDllsFromOutput" AfterTargets="ResolveReferences">
         <!--
@@ -70,18 +90,19 @@
             <NonCopyLocalPackageReferences Condition="'%(PackageReference.CopyLocal)' == 'false'">;@(PackageReference);</NonCopyLocalPackageReferences>
         </PropertyGroup>
         <ItemGroup>
-            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="$(NonCopyLocalPackageReferences.Contains(';%(ReferenceCopyLocalPaths.NuGetPackageId);'))" />
+            <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="$(NonCopyLocalPackageReferences.Contains(';%(ReferenceCopyLocalPaths.NuGetPackageId);'))"/>
         </ItemGroup>
     </Target>
 
     <ItemGroup>
-        <None Include="build/**" Pack="true" PackagePath="build" />
-        <Compile Include="ContextAwareTask.fs" />
-        <Compile Include="GenerateOpenAPIClient.fs" />
-        <Compile Include="ModuleInitializer.fs" />
-        <Compile Include="AssemblyResolver.fs" />
+        <None Include="build/**" Pack="true" PackagePath="build"/>
+        <Compile Include="ContextAwareTask.fs"/>
+        <Compile Include="GenerateOpenAPIClient.fs"/>
+        <Compile Include="ModuleInitializer.fs"/>
+        <Compile Include="AssemblyResolver.fs"/>
+        <Content Include="buildCrossTargeting\Hawaii.Tasks.targets"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="../src/Hawaii.fsproj" PrivateAssets="All" />
+        <ProjectReference Include="../src/Hawaii.fsproj" PrivateAssets="All"/>
     </ItemGroup>
 </Project>
