@@ -67,4 +67,3 @@ type public GenerateOpenAPIClient() =
         let executionCode = runConfig configName
         
         executionCode = 0
-            

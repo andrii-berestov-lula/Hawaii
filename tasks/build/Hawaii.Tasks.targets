@@ -36,6 +36,11 @@
         <PackageReference Include="Fable.Remoting.Json" Version="2.14.*" Condition="$(HawaiiTarget) == 'fable'"/>
     </ItemGroup>
     <PropertyGroup>
+        <TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' ">MSBuildCore</TaskFolder>
+        <TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' ">MSBuildFull</TaskFolder>
+        <TaskAssembly>$(MSBuildThisFileDirectory)..\build\$(TaskFolder)\Snowflaqe.Tasks.dll</TaskAssembly>
+    </PropertyGroup>
+    <PropertyGroup>
         <TaskAssembly>$(MSBuildThisFileDirectory)..\build\$(TaskFolder)\Hawaii.Tasks.dll</TaskAssembly>
     </PropertyGroup>
     <UsingTask TaskName="Hawaii.Tasks.GenerateOpenAPIClient" AssemblyFile="$(TaskAssembly)"/>

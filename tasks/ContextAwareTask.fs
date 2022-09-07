@@ -4,10 +4,14 @@ namespace Hawaii.Tasks
 open System;
 open System.IO;
 open System.Linq;
-open System.Reflection;
+open System.Reflection
+#if NETCOREAPP2_0
 open System.Runtime.Loader;
+#endif
 open Microsoft.Build.Framework;
 open Microsoft.Build.Utilities
+
+
 [<AbstractClass>]
 type public ContextAwareTask () as cat =
     inherit Task()
@@ -29,6 +33,7 @@ type public ContextAwareTask () as cat =
     abstract member ExecuteInner: unit -> bool
 
     override this.Execute() =
+#if NETCOREAPP2_0
         let taskAssemblyPath = Uri(typeInfo.Assembly.Location).LocalPath
         let ctxt = CustomAssemblyLoader(this)
         let inContextAssembly = ctxt.LoadFromAssemblyPath(taskAssemblyPath)
@@ -68,6 +73,18 @@ type public ContextAwareTask () as cat =
                     outerProperty.SetValue(this, innerProperty.GetValue(innerTask)))
 
         result
+#else
+         // On .NET Framework (on Windows), we find native binaries by adding them to our PATH.
+        if not (this.UnmanagedDllDirectory = null) then
+            let pathEnvVar = Environment.GetEnvironmentVariable("PATH")
+            let searchPaths = pathEnvVar.Split(Path.PathSeparator)
+            if not (searchPaths.Contains(this.UnmanagedDllDirectory, StringComparer.OrdinalIgnoreCase)) then
+                let pathEnvVar = $"{pathEnvVar}{Path.PathSeparator}{this.UnmanagedDllDirectory}"
+                Environment.SetEnvironmentVariable("PATH", pathEnvVar)
+
+        this.ExecuteInner()
+#endif
+#if NETCOREAPP2_0
 and private CustomAssemblyLoader(loaderTask: ContextAwareTask) =
     inherit AssemblyLoadContext()
 
@@ -92,5 +109,4 @@ and private CustomAssemblyLoader(loaderTask: ContextAwareTask) =
         if unmanagedDllPath <> null
         then this.LoadUnmanagedDllFromPath(unmanagedDllPath)
         else base.LoadUnmanagedDll(unmanagedDllName)
-
-
+#endif
